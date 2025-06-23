@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>한국 음식 가격 지도</title>
+    <title>Dishtrict Map</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500;700&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>한국 음식 가격 지도</h1>
+        <h1>Dishtrict Map</h1>
     </header>
     <main>
         <div class="main-flex-row map-flex-row">
@@ -29,6 +30,198 @@
                 <div class="colorbar-title">{{ selected_cat if selected_cat else '선택안됨' }} 가격</div>
             </div>
         </div>
+
+        <div class="price-recommendation-section">
+            <h2 class="section-title">🍽️ 음식 가격 추천 시스템</h2>
+            <p class="section-description">지역, 음식 타입, 주재료, 맵기를 선택하여 최적의 가격을 추천받으세요</p>
+            
+            <div class="recommendation-container">
+                <div class="input-group">
+                    <div class="dropdown-selector">
+                        <button class="dropdown-btn" type="button" onclick="toggleDropdown('region')">
+                            <span class="selected-text">지역 선택</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="region-dropdown">
+                            <div class="option" data-value="서울">서울</div>
+                            <div class="option" data-value="부산">부산</div>
+                            <div class="option" data-value="대구">대구</div>
+                            <div class="option" data-value="인천">인천</div>
+                            <div class="option" data-value="광주">광주</div>
+                            <div class="option" data-value="대전">대전</div>
+                            <div class="option" data-value="울산">울산</div>
+                            <div class="option" data-value="세종">세종</div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-selector">
+                        <button class="dropdown-btn" type="button" onclick="toggleDropdown('foodType')">
+                            <span class="selected-text">음식 타입</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="foodType-dropdown">
+                            <div class="option" data-value="한식">한식</div>
+                            <div class="option" data-value="중식">중식</div>
+                            <div class="option" data-value="일식">일식</div>
+                            <div class="option" data-value="양식">양식</div>
+                            <div class="option" data-value="분식">분식</div>
+                            <div class="option" data-value="카페">카페</div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-selector">
+                        <button class="dropdown-btn" type="button" onclick="toggleDropdown('ingredient')">
+                            <span class="selected-text">주재료</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="ingredient-dropdown">
+                            <div class="option" data-value="돼지고기">돼지고기</div>
+                            <div class="option" data-value="소고기">소고기</div>
+                            <div class="option" data-value="닭고기">닭고기</div>
+                            <div class="option" data-value="해산물">해산물</div>
+                            <div class="option" data-value="채소">채소</div>
+                            <div class="option" data-value="면류">면류</div>
+                            <div class="option" data-value="밥류">밥류</div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-selector">
+                        <button class="dropdown-btn" type="button" onclick="toggleDropdown('spiciness')">
+                            <span class="selected-text">맵기</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="spiciness-dropdown">
+                            <div class="option" data-value="순한맛">순한맛</div>
+                            <div class="option" data-value="보통맛">보통맛</div>
+                            <div class="option" data-value="매운맛">매운맛</div>
+                            <div class="option" data-value="매우매운맛">매우매운맛</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="recommend-btn" onclick="getPriceRecommendation()">
+                    <i class="fas fa-calculator"></i>
+                    가격 추천받기
+                </button>
+
+                <div class="result-container" id="result-container" style="display: none;">
+                    <div class="result-card">
+                        <h3>추천 가격</h3>
+                        <div class="price-display" id="price-display">
+                            <span class="price-amount" id="price-amount">0</span>
+                            <span class="price-unit">원</span>
+                        </div>
+                        <div class="price-explanation" id="price-explanation">
+                            선택하신 조건을 바탕으로 추천된 가격입니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <script>
+        // 드롭다운 토글 함수
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId + '-dropdown');
+            const btn = document.querySelector(`[onclick="toggleDropdown('${dropdownId}')"]`);
+            const allDropdowns = document.querySelectorAll('.dropdown-content');
+            const allBtns = document.querySelectorAll('.dropdown-btn');
+            
+            // 다른 드롭다운들 닫기
+            allDropdowns.forEach(dd => {
+                if (dd !== dropdown) {
+                    dd.classList.remove('show');
+                }
+            });
+            
+            // 다른 버튼들의 active 상태 제거
+            allBtns.forEach(b => {
+                if (b !== btn) {
+                    b.classList.remove('active');
+                }
+            });
+            
+            // 현재 드롭다운 토글
+            dropdown.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+
+        // 옵션 선택 함수
+        function selectOption(dropdownId, value, text) {
+            const btn = document.querySelector(`[onclick="toggleDropdown('${dropdownId}')"]`);
+            const selectedText = btn.querySelector('.selected-text');
+            selectedText.textContent = text;
+            selectedText.setAttribute('data-value', value);
+            
+            // 드롭다운 닫기
+            document.getElementById(dropdownId + '-dropdown').classList.remove('show');
+            btn.classList.remove('active');
+        }
+
+        // 가격 추천 함수
+        function getPriceRecommendation() {
+            const region = document.querySelector('[onclick="toggleDropdown(\'region\')"] .selected-text').getAttribute('data-value');
+            const foodType = document.querySelector('[onclick="toggleDropdown(\'foodType\')"] .selected-text').getAttribute('data-value');
+            const ingredient = document.querySelector('[onclick="toggleDropdown(\'ingredient\')"] .selected-text').getAttribute('data-value');
+            const spiciness = document.querySelector('[onclick="toggleDropdown(\'spiciness\')"] .selected-text').getAttribute('data-value');
+
+            // 모든 항목이 선택되었는지 확인
+            if (!region || !foodType || !ingredient || !spiciness) {
+                alert('모든 항목을 선택해주세요.');
+                return;
+            }
+
+            // 로딩 표시
+            const resultContainer = document.getElementById('result-container');
+            const priceAmount = document.getElementById('price-amount');
+            const priceExplanation = document.getElementById('price-explanation');
+            
+            resultContainer.style.display = 'block';
+            priceAmount.textContent = '계산 중...';
+            priceExplanation.textContent = 'AI가 최적의 가격을 분석하고 있습니다.';
+
+            // 백엔드 API 호출 (실제 구현 시)
+            setTimeout(() => {
+                // 임시 결과 (실제로는 백엔드에서 받아올 데이터)
+                const mockPrice = Math.floor(Math.random() * 5000) + 8000; // 8000~13000원
+                priceAmount.textContent = mockPrice.toLocaleString();
+                priceExplanation.textContent = `${region} 지역의 ${foodType} ${ingredient} ${spiciness} 메뉴에 대한 추천 가격입니다.`;
+            }, 1500);
+        }
+
+        // 드롭다운 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-btn') && !event.target.matches('.dropdown-btn *')) {
+                const dropdowns = document.querySelectorAll('.dropdown-content');
+                const btns = document.querySelectorAll('.dropdown-btn');
+                
+                dropdowns.forEach(dropdown => {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                
+                btns.forEach(btn => {
+                    if (btn.classList.contains('active')) {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // 옵션 클릭 이벤트 리스너
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    const dropdownId = this.parentElement.id.replace('-dropdown', '');
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    selectOption(dropdownId, value, text);
+                });
+            });
+        });
+    </script>
 </body>
 </html> 
