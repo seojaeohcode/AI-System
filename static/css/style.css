@@ -227,6 +227,7 @@ footer p {
   margin: 0 auto;
   gap: 32px;
   margin-top: 60px;
+  margin-bottom: 12vh;
 }
 .colorbar-legend {
   display: flex;
