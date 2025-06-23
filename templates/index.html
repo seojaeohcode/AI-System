@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>한국 음식 가격 지도</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500;700&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <h1>한국 음식 가격 지도</h1>
     </header>
     <main>
-        <div class="map-container">
-            {{ map_html|safe }}
+        <div class="main-flex-row map-flex-row">
+            <form method="post" id="catForm" class="side-radio-form">
+                {% for cat in categories %}
+                    <input type="radio" name="category" value="{{ cat }}" id="cat_{{ loop.index }}" {% if cat == selected_cat %}checked{% endif %} onchange="document.getElementById('catForm').submit();">
+                    <label for="cat_{{ loop.index }}">{{ cat }}</label>
+                {% endfor %}
+            </form>
+            <div class="map-container">
+                {{ map_html|safe }}
+            </div>
+            <div class="colorbar-legend">
+                <span class="colorbar-value colorbar-value-top">{{ vmax if selected_cat else 0 }}</span>
+                <div class="colorbar-gradient {% if not selected_cat %}colorbar-gradient-empty{% endif %}"></div>
+                <span class="colorbar-value colorbar-value-bottom">{{ vmin if selected_cat else 0 }}</span>
+                <div class="colorbar-title">{{ selected_cat if selected_cat else '선택안됨' }} 가격</div>
+            </div>
         </div>
     </main>
-    <footer>
-        <p>© 2023 한국 데이터 시각화</p>
-    </footer>
 </body>
 </html> 
